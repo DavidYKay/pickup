@@ -1,0 +1,30 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Picked Her Up | Home{% endblock %}
+
+{% block content %}
+
+{% block bonus-content %}{% endblock %}
+
+{% block stories %}
+<ul id="stories-list">
+{% for story in stories %}
+<li>
+  <div class="author">
+    {% if story.author %}
+      <b>{{ story.author.nickname }}</b> wrote:
+    {% else %}
+      An anonymous person wrote:
+    {% endif %}
+  </div>
+  <div class="text">
+    <blockquote>{{ story.content|escape }}</blockquote>
+  </div>
+</li>
+{% endfor %}
+</ul>
+{% endblock %}
+
+<a href="{{ url }}">{{ url_linktext }}</a>
+
+{% endblock %}

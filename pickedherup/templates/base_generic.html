@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>
+      {% block title %}Picked Her Up{% endblock %}
+    </title>
+    <link type="text/css" rel="stylesheet" href="/stylesheets/main.css" />
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="header"><h1>Picked Her Up</h1></div>
+      <div id="nav">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/new">New Story</a></li>
+          <li><a href="/">This Week</a></li>
+          <li><a href="/">This Month</a></li>
+          <li><a href="/random">Random</a></li>
+        </ul>
+      </div>
+      <div id="main">
+        {% block content %}
+        {% endblock %}
+      </div>
+      <div id="sidebar">
+        <h2>Right-hand Column</h2>
+        <p>Ads go here.</p>
+        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris vel magna.</p>
+        <ul>
+          <li><a href="/">Link 1</a></li>
+          <li><a href="/">Link 2</a></li>
+          <li><a href="/">Link 3</a></li>
+          <li><a href="/">Link 4</a></li>
+          <li><a href="/">Link 5</a></li>
+        </ul>
+      </div>
+      <div id="footer">
+        <p>Copyright 2011, Kong Entertainment</p>
+      </div>
+    </div>
+  </body>
+</html>
