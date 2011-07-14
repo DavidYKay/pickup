@@ -77,6 +77,15 @@ class MainPage(BasePage):
         # Consisting of our template with our values applied.
         template.render(path, template_values))
 
+class CommentPage(BasePage):
+  """ The comment page. """
+  template_name = 'comment.html'
+  def get(self):
+    comment_id = self.request.get('comment_id')
+    # Fetch comments
+    # Display comments
+    self.response.out.write(blah blah blah)
+
 class NewPage(MainPage):
   """ The input page. Largely the same as the mainpage, but with a different
       template. """
@@ -109,6 +118,7 @@ class Storybook(webapp.RequestHandler):
 # Bind routes.
 application = webapp.WSGIApplication([
   ('/', MainPage),
+  ('/story', CommentPage),
   ('/new', NewPage),
   ('/random', RandomPage),
   ('/sign', Storybook)
