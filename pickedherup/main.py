@@ -63,14 +63,19 @@ class MainPage(BasePage):
   template_name = 'main.html'
   sortParams = False
   def get(self):
+    # Fetch Stories from the datastore.
     stories = self.fetchStories(self.sortParams)
 
+    # Our content & login link.
     template_values = dict({
         'stories': stories,
     }.items() + Helpers.createLoginLink(self).items())
 
     path = Helpers.fetchTemplate(self.template_name)
-    self.response.out.write(template.render(path, template_values))
+    # Write our response to the client.
+    self.response.out.write(
+        # Consisting of our template with our values applied.
+        template.render(path, template_values))
 
 class NewPage(MainPage):
   """ The input page. Largely the same as the mainpage, but with a different
@@ -95,6 +100,7 @@ class Storybook(webapp.RequestHandler):
       story.author = users.get_current_user()
 
     story.content = self.request.get('content')
+    # Store the content.
     story.put()
     # Redirect back to the main page.
     self.redirect('/?' + urllib.urlencode({'storybook_name': storybook_name}))

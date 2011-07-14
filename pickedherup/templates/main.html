@@ -16,6 +16,9 @@
     {% else %}
       An anonymous person wrote:
     {% endif %}
+    <div class="timestamp">
+      Time: {{ story.date }}
+    </div>
   </div>
   <div class="text">
     <blockquote>{{ story.content|escape }}</blockquote>
