@@ -54,6 +54,10 @@ class BasePage(webapp.RequestHandler):
     stories_query = Story.all().ancestor(
         storybook_key(storybook_name)).order('-date')
     stories = stories_query.fetch(Constants.NUM_STORIES)
+    # Add the nicetime to the story.
+    for story in stories:
+        story.nicetime = story.date.strftime('%c')
+
     if (shuffle):
       random.shuffle(stories)
     return stories
