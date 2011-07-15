@@ -84,7 +84,8 @@ class CommentPage(BasePage):
     comment_id = self.request.get('comment_id')
     # Fetch comments
     # Display comments
-    self.response.out.write(blah blah blah)
+    self.response.out.write(
+        template.render(path, template_values))
 
 class NewPage(MainPage):
   """ The input page. Largely the same as the mainpage, but with a different

@@ -10,18 +10,18 @@
 <ul id="stories-list">
 {% for story in stories %}
 <li>
-  <div class="author">
-    {% if story.author %}
-      <b>{{ story.author.nickname }}</b> wrote:
-    {% else %}
-      An anonymous person wrote:
-    {% endif %}
-    <div class="timestamp">
-      Time: {{ story.date }}
-    </div>
-  </div>
   <div class="text">
     <blockquote>{{ story.content|escape }}</blockquote>
+  </div>
+  <div class="author">
+    {% if story.author %}
+      by <b>{{ story.author.nickname }}</b>
+    {% else %}
+      by Anonymous
+    {% endif %}
+    <div class="timestamp">
+      ({{ story.date }})
+    </div>
   </div>
 </li>
 {% endfor %}
