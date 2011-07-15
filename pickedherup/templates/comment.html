@@ -1,0 +1,39 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Picked Her Up | Story Number: {{ story.id }} {% endblock %}
+
+{% block content %}
+
+{% block bonus-content %}{% endblock %}
+
+{% block story %}
+  <div class="story">
+    <blockquote>{{ story.content|escape }}</blockquote>
+  </div>
+{% endblock %}
+
+{% block comments %}
+<ul id="comments-list">
+{% for comment in comments %}
+<li>
+  <div class="text">
+    <blockquote>{{ comment.content|escape }}</blockquote>
+  </div>
+  <div class="author">
+    {% if comment.author %}
+      by <b>{{ comment.author.nickname }}</b>
+    {% else %}
+      by Anonymous
+    {% endif %}
+    <div class="timestamp">
+      ({{ comment.nicetime }})
+    </div>
+  </div>
+</li>
+{% endfor %}
+</ul>
+{% endblock %}
+
+<a href="{{ url }}">{{ url_linktext }}</a>
+
+{% endblock %}

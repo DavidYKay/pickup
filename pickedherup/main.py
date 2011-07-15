@@ -40,6 +40,13 @@ class Story(db.Model):
   content = db.StringProperty(multiline=True)
   date    = db.DateTimeProperty(auto_now_add=True)
 
+class Comment(db.Model):
+  """Models an individual comment with an author, content, and date."""
+  story   = db.ReferenceProperty(Story)
+  author  = db.UserProperty()
+  content = db.StringProperty(multiline=True)
+  date    = db.DateTimeProperty(auto_now_add=True)
+
 def storybook_key(storybook_name=None):
   """Constructs a datastore key for a Storybook entity with storybook_name."""
   return db.Key.from_path('Storybook', storybook_name or 'default_storybook')
@@ -57,6 +64,7 @@ class BasePage(webapp.RequestHandler):
     # Add the nicetime to the story.
     for story in stories:
         story.nicetime = story.date.strftime('%c')
+        story.comment_url = '/story' + "?story_id=" + str(story.key().id())
 
     if (shuffle):
       random.shuffle(stories)
@@ -84,10 +92,54 @@ class MainPage(BasePage):
 class CommentPage(BasePage):
   """ The comment page. """
   template_name = 'comment.html'
+
+  def fetchStory(self, story_id):
+    """Fetches a single story from the DataStore."""
+    # Prepare a stories query for the datastore.
+    # This tells us what to filter by.
+    # TODO: Properly filter by ID
+    #k = Key.from_path('User', 'Boris', 'Address', 9876)
+    #stories_query = Story.all().filter('id =', story_id)
+    #stories_query = Story.gql("WHERE id = :1", story_id)
+    stories_query = Story.all()
+
+    # Execute the query on the datastore, telling it how many documents we want. We get a list back.
+    stories = stories_query.fetch(1)
+    # Grab the first member of the list.
+    story = stories[0]
+
+    # Add the nicetime to the story.
+    story.nicetime = story.date.strftime('%c')
+    return story
+
+  #def fetchComments(self, story_id):
+  #  """Fetches comments from the DataStore.
+  #    TODO: Pass in different parameters based on different criteria.
+  #  """
+  #  commentbook_name = self.request.get('commentbook_name')
+  #  comments_query = Story.all().ancestor(
+  #      commentbook_key(commentbook_name)).order('-date')
+  #  comments = comments_query.fetch(Constants.NUM_STORIES)
+  #  # Add the nicetime to the comment.
+  #  for comment in comments:
+  #      comment.nicetime = comment.date.strftime('%c')
+  #  return comments
+
   def get(self):
-    comment_id = self.request.get('comment_id')
-    # Fetch comments
-    # Display comments
+    story_id = self.request.get('story_id')
+    # Fetch comments for our given story.
+    story = self.fetchStory(story_id)
+    #comments = self.fetchComments(story_id)
+    comments = []
+
+    # Render comments to page.
+    # Our content & login link.
+    template_values = dict({
+        'story': story,
+        'comments': comments,
+    }.items() + Helpers.createLoginLink(self).items())
+
+    path = Helpers.fetchTemplate(self.template_name)
     self.response.out.write(
         template.render(path, template_values))
 
