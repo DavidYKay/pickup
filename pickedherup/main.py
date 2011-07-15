@@ -9,6 +9,7 @@ from google.appengine.api import users
 from google.appengine.ext import db
 from google.appengine.ext.webapp import template
 from google.appengine.ext import webapp
+from google.appengine.ext.db import Key
 from google.appengine.ext.webapp.util import run_wsgi_app
 
 class Constants:
@@ -64,7 +65,8 @@ class BasePage(webapp.RequestHandler):
     # Add the nicetime to the story.
     for story in stories:
         story.nicetime = story.date.strftime('%c')
-        story.comment_url = '/story' + "?story_id=" + str(story.key().id())
+        #story.comment_url = '/story' + "?story_id=" + str(story.key().id())
+        story.comment_url = '/story' + "?story_id=" + str(story.key())
 
     if (shuffle):
       random.shuffle(stories)
@@ -97,16 +99,19 @@ class CommentPage(BasePage):
     """Fetches a single story from the DataStore."""
     # Prepare a stories query for the datastore.
     # This tells us what to filter by.
-    # TODO: Properly filter by ID
+    # TODO: Move to a prettier URL scheme
     #k = Key.from_path('User', 'Boris', 'Address', 9876)
     #stories_query = Story.all().filter('id =', story_id)
-    #stories_query = Story.gql("WHERE id = :1", story_id)
-    stories_query = Story.all()
-
+    #stories_query = Story.all()
+    #stories_query = Story.gql("WHERE id = :1", 1L)
+    stories_query = Story.all().filter('__key__ = ', Key(story_id))
     # Execute the query on the datastore, telling it how many documents we want. We get a list back.
     stories = stories_query.fetch(1)
     # Grab the first member of the list.
     story = stories[0]
+
+    #story = Story.get_by_id(int(story_id))
+    #story = Story.get_by_id(1L)
 
     # Add the nicetime to the story.
     story.nicetime = story.date.strftime('%c')
