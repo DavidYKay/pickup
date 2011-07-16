@@ -40,6 +40,17 @@ class Helpers:
   def nicetime(date):
     return date.strftime('%c')
 
+  @staticmethod
+  def renderWithLogin(requestHandler, template_name, template_values):
+    # Add login link to our template values.
+    template_values = dict(template_values.items() +
+                           Helpers.createLoginLink(requestHandler).items())
+    # Render response to client.
+    requestHandler.response.out.write(
+        template.render(
+            Helpers.fetchTemplate(template_name),
+            template_values))
+
 class Story(db.Model):
   """Models an individual Storybook entry with an author, content, and date."""
   author  = db.UserProperty()
@@ -56,8 +67,7 @@ class Comment(db.Model):
 def storyIdToKey(story_id):
   return Key.from_path('Story',
                        int(story_id),
-                       parent=storybook_key()
-                       )
+                       parent=storybook_key())
 
 def storybook_key(storybook_name=None):
   """Constructs a datastore key for a Storybook entity with storybook_name."""
@@ -86,21 +96,15 @@ class BasePage(webapp.RequestHandler):
 class MainPage(BasePage):
   """ Homepage. Takes care of the login link and the list of stories. """
   template_name = 'main.html'
-  sortParams = False
+  shuffle = False
   def get(self):
     # Fetch Stories from the datastore.
-    stories = self.fetchStories(self.sortParams)
+    stories = self.fetchStories(self.shuffle)
 
-    # Our content & login link.
-    template_values = dict({
-        'stories': stories,
-    }.items() + Helpers.createLoginLink(self).items())
-
-    path = Helpers.fetchTemplate(self.template_name)
-    # Write our response to the client.
-    self.response.out.write(
-        # Consisting of our template with our values applied.
-        template.render(path, template_values))
+    # Our content.
+    template_values = { 'stories': stories }
+    # Render our response, including our login link.
+    Helpers.renderWithLogin(self, self.template_name, template_values)
 
 class CommentPage(BasePage):
   """ The comment page. """
@@ -137,19 +141,16 @@ class CommentPage(BasePage):
     story_id = self.request.get('story_id')
     # Fetch comments for our given story.
     story = self.fetchStory(story_id)
-    #comments = self.fetchComments(story_id)
     comments = self.fetchComments(story_id)
 
-    # Render comments to page.
-    # Our content & login link.
-    template_values = dict({
+    # Our content.
+    template_values = {
         'story': story,
         'comments': comments,
-    }.items() + Helpers.createLoginLink(self).items())
+    }
 
-    path = Helpers.fetchTemplate(self.template_name)
-    self.response.out.write(
-        template.render(path, template_values))
+    # Render comments to page.
+    Helpers.renderWithLogin(self, self.template_name, template_values)
 
 class CommentHandler(webapp.RequestHandler):
   """ Handles comment uploading. :"""
@@ -176,7 +177,7 @@ class NewPage(MainPage):
 
 class RandomPage(MainPage):
   """ Same as MainPage, but shows items in a random order."""
-  sortParams = True
+  shuffle = True
 
 class Storybook(webapp.RequestHandler):
   """ Headless POST handler. Redirects back to homepage. """
@@ -196,7 +197,6 @@ class Storybook(webapp.RequestHandler):
     story.put()
     # Redirect back to the main page.
     self.redirect('/?' + urllib.urlencode({'storybook_name': storybook_name}))
-
 
 # Bind routes.
 application = webapp.WSGIApplication([

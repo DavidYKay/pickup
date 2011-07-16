@@ -7,9 +7,23 @@
 {% block bonus-content %}{% endblock %}
 
 {% block story %}
-  <div class="story">
-    <blockquote>{{ story.content|escape }}</blockquote>
-  </div>
+<ul id="story">
+  <li>
+    <div class="content">
+      <blockquote>{{ story.content|escape }}</blockquote>
+    </div>
+    <div class="author">
+      {% if comment.author %}
+      by <b>{{ comment.author.nickname }}</b>
+      {% else %}
+      by Anonymous
+      {% endif %}
+      <div class="timestamp">
+        ({{ story.nicetime }})
+      </div>
+    </div>
+  </li>
+</ul>
 {% endblock %}
 
 {% block comments %}
