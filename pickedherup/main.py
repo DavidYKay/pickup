@@ -36,6 +36,10 @@ class Helpers:
         'url_linktext': url_linktext,
     }
 
+  @staticmethod
+  def nicetime(date):
+    return date.strftime('%c')
+
 class Story(db.Model):
   """Models an individual Storybook entry with an author, content, and date."""
   author  = db.UserProperty()
@@ -65,7 +69,7 @@ class BasePage(webapp.RequestHandler):
     stories = stories_query.fetch(Constants.NUM_STORIES)
     # Add the nicetime to the story.
     for story in stories:
-        story.nicetime = story.date.strftime('%c')
+        story.nicetime = Helpers.nicetime(story.date)
         story.id = story.key().id()
         story.comment_url = '/story?' + urllib.urlencode({'story_id': story.id})
 
@@ -113,7 +117,7 @@ class CommentPage(BasePage):
     story = stories[0]
 
     # Add the nicetime to the story.
-    story.nicetime = story.date.strftime('%c')
+    story.nicetime = Helpers.nicetime(story.date)
     story.id = story_id
     return story
 
