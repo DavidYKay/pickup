@@ -13,6 +13,7 @@
 {% endblock %}
 
 {% block comments %}
+Comments Below:
 <ul id="comments-list">
 {% for comment in comments %}
 <li>
@@ -32,6 +33,13 @@
 </li>
 {% endfor %}
 </ul>
+{% endblock %}
+
+{% block post-comment %}
+<form action="/comment?story_id={{story.id}}" method="post">
+  <div><textarea name="content" rows="3" cols="60"></textarea></div>
+  <div><input type="submit" value="Post Comment"></div>
+</form>
 {% endblock %}
 
 <a href="{{ url }}">{{ url_linktext }}</a>

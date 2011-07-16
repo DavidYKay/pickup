@@ -15,6 +15,7 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 class Constants:
   TEMPLATE_PATH = 'templates/'
   NUM_STORIES = 10
+  NUM_COMMENTS = 10
 
 class Helpers:
   """Helper functions that crop up often."""
@@ -43,7 +44,7 @@ class Story(db.Model):
 
 class Comment(db.Model):
   """Models an individual comment with an author, content, and date."""
-  story   = db.ReferenceProperty(Story)
+  story   = db.ReferenceProperty(Story, collection_name='comments')
   author  = db.UserProperty()
   content = db.StringProperty(multiline=True)
   date    = db.DateTimeProperty(auto_now_add=True)
@@ -65,8 +66,8 @@ class BasePage(webapp.RequestHandler):
     # Add the nicetime to the story.
     for story in stories:
         story.nicetime = story.date.strftime('%c')
-        story.comment_url = '/story' + "?story_id=" + str(story.key().id())
-        #story.comment_url = '/story' + "?story_id=" + str(story.key())
+        story.id = story.key().id()
+        story.comment_url = '/story?' + urllib.urlencode({'story_id': story.id})
 
     if (shuffle):
       random.shuffle(stories)
@@ -113,27 +114,29 @@ class CommentPage(BasePage):
 
     # Add the nicetime to the story.
     story.nicetime = story.date.strftime('%c')
+    story.id = story_id
     return story
 
-  #def fetchComments(self, story_id):
-  #  """Fetches comments from the DataStore.
-  #    TODO: Pass in different parameters based on different criteria.
-  #  """
-  #  commentbook_name = self.request.get('commentbook_name')
-  #  comments_query = Story.all().ancestor(
-  #      commentbook_key(commentbook_name)).order('-date')
-  #  comments = comments_query.fetch(Constants.NUM_STORIES)
-  #  # Add the nicetime to the comment.
-  #  for comment in comments:
-  #      comment.nicetime = comment.date.strftime('%c')
-  #  return comments
+  def fetchComments(self, story_id):
+    """Fetches comments from the DataStore."""
+    story_key = Key.from_path('Story',
+                        int(story_id),
+                        parent=storybook_key()
+                        )
+
+    comments_query = Comment.all().filter('story = ', story_key).order('-date')
+    comments = comments_query.fetch(Constants.NUM_COMMENTS)
+    # Add the nicetime to the comment.
+    for comment in comments:
+        comment.nicetime = comment.date.strftime('%c')
+    return comments
 
   def get(self):
     story_id = self.request.get('story_id')
     # Fetch comments for our given story.
     story = self.fetchStory(story_id)
     #comments = self.fetchComments(story_id)
-    comments = []
+    comments = self.fetchComments(story_id)
 
     # Render comments to page.
     # Our content & login link.
@@ -145,6 +148,28 @@ class CommentPage(BasePage):
     path = Helpers.fetchTemplate(self.template_name)
     self.response.out.write(
         template.render(path, template_values))
+
+class CommentHandler(webapp.RequestHandler):
+  """ Handles comment uploading. :"""
+  #TODO: Consider merging this with above handler.
+  def post(self):
+    story_id = self.request.get('story_id')
+    # Create comment object.
+    comment = Comment()
+    if users.get_current_user():
+      comment.author = users.get_current_user()
+    # Fetch content from request.
+    comment.content = self.request.get('content')
+    # TODO: See if this works properly
+    comment.story = Key.from_path('Story',
+                        int(story_id),
+                        parent=storybook_key()
+                        )
+
+    # Store in datastore.
+    comment.put()
+    # Redirect back to story & comment page.
+    self.redirect('/story?' + urllib.urlencode({'story_id': story_id}))
 
 class NewPage(MainPage):
   """ The input page. Largely the same as the mainpage, but with a different
@@ -179,6 +204,7 @@ class Storybook(webapp.RequestHandler):
 application = webapp.WSGIApplication([
   ('/', MainPage),
   ('/story', CommentPage),
+  ('/comment', CommentHandler),
   ('/new', NewPage),
   ('/random', RandomPage),
   ('/sign', Storybook)
