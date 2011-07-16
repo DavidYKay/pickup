@@ -32,8 +32,8 @@ class Helpers:
       url = users.create_login_url(handler.request.uri)
       url_linktext = 'Login'
     return {
-        'url': url,
-        'url_linktext': url_linktext,
+        'login': url,
+        'login_linktext': url_linktext,
     }
 
   @staticmethod

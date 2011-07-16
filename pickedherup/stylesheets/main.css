@@ -76,3 +76,10 @@ ul, ol {
 #main ul#story li {
   background:#fff;
 }
+
+#login {
+  /*
+  float: right;
+  */
+  text-align: right;
+}
