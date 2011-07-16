@@ -53,6 +53,12 @@ class Comment(db.Model):
   content = db.StringProperty(multiline=True)
   date    = db.DateTimeProperty(auto_now_add=True)
 
+def storyIdToKey(story_id):
+  return Key.from_path('Story',
+                       int(story_id),
+                       parent=storybook_key()
+                       )
+
 def storybook_key(storybook_name=None):
   """Constructs a datastore key for a Storybook entity with storybook_name."""
   return db.Key.from_path('Storybook', storybook_name or 'default_storybook')
@@ -104,16 +110,12 @@ class CommentPage(BasePage):
     """Fetches a single story from the DataStore."""
     # Prepare a stories query for the datastore.
     # This tells us what to filter by.
-    key = Key.from_path('Story',
-                        int(story_id),
-                        parent=storybook_key()
-                        )
-
+    key = storyIdToKey(story_id)
     stories_query = Story.all().filter('__key__ = ', key)
 
     # Execute the query on the datastore, telling it how many documents we want. We get a list back.
     stories = stories_query.fetch(1)
-    ## Grab the first member of the list.
+    # Grab the first member of the list.
     story = stories[0]
 
     # Add the nicetime to the story.
@@ -123,11 +125,7 @@ class CommentPage(BasePage):
 
   def fetchComments(self, story_id):
     """Fetches comments from the DataStore."""
-    story_key = Key.from_path('Story',
-                        int(story_id),
-                        parent=storybook_key()
-                        )
-
+    story_key = storyIdToKey(story_id)
     comments_query = Comment.all().filter('story = ', story_key).order('-date')
     comments = comments_query.fetch(Constants.NUM_COMMENTS)
     # Add the nicetime to the comment.
@@ -165,11 +163,7 @@ class CommentHandler(webapp.RequestHandler):
     # Fetch content from request.
     comment.content = self.request.get('content')
     # TODO: See if this works properly
-    comment.story = Key.from_path('Story',
-                        int(story_id),
-                        parent=storybook_key()
-                        )
-
+    comment.story = storyIdToKey(story_id)
     # Store in datastore.
     comment.put()
     # Redirect back to story & comment page.
