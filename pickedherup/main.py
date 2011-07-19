@@ -38,7 +38,7 @@ class Helpers:
 
   @staticmethod
   def nicetime(date):
-    return date.strftime('%c')
+    return date.strftime('%m/%d/%y %I:%M %p')
 
   @staticmethod
   def renderWithLogin(requestHandler, template_name, template_values):
