@@ -6,7 +6,7 @@ body, html {
   background:#a7a09a;
 }
 #wrap {
-  width:750px;
+  width:920px;
   margin:0 auto;
   background:#99c;
 }
@@ -33,7 +33,7 @@ h1 {
 }
 #main {
   float:left;
-  width:480px;
+  width:650px;
   padding:10px;
   background:#9c9;
 }
@@ -65,7 +65,21 @@ ul, ol {
   list-style: none;
 }
 
+#login {
+  /*
+  float: right;
+  */
+  text-align: right;
+}
+
+/* Story Styles. */
+
 #main ul#stories-list li {
+  background:#fff;
+}
+
+/* Special rule for story on comments page. */
+#main ul#stories-list li .text {
   background:#fff;
 }
 
@@ -73,13 +87,23 @@ ul, ol {
   background:#fff;
 }
 
-#main ul#story li {
-  background:#fff;
+
+/*
+#main ul#stories-list li .controls {
+  display: block;
+}
+  */
+
+.voting {
+  float: left;
 }
 
-#login {
-  /*
-  float: right;
-  */
-  text-align: right;
+.comments {
+  float: left;
+  margin-left: 4px;
+}
+
+.controls {
+  clear: both;
+  overflow: hidden;
 }

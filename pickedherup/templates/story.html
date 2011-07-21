@@ -1,0 +1,22 @@
+<div class="text">
+  <blockquote>{{ story.content|escape }}</blockquote>
+</div>
+<div class="author">
+  {% if story.author %}
+    by <b>{{ story.author.nickname }}</b>
+  {% else %}
+    by Anonymous
+  {% endif %}
+  <div class="timestamp">
+    ({{ story.nicetime }})
+  </div>
+</div>
+<div class="controls">
+  <div class="voting">
+    <a href="{{ story.upvote_url }}">Upvote</a>
+    <a href="{{ story.downvote_url }}">Downvote</a>
+  </div>
+  <div class="comments">
+    <a href="{{ story.comment_url }}">Comments</a>
+  </div>
+</div>
