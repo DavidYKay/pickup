@@ -53,9 +53,11 @@ class Helpers:
 
 class Story(db.Model):
   """Models an individual Storybook entry with an author, content, and date."""
-  author  = db.UserProperty()
-  content = db.StringProperty(multiline=True)
-  date    = db.DateTimeProperty(auto_now_add=True)
+  author     = db.UserProperty()
+  content    = db.StringProperty(multiline=True)
+  date       = db.DateTimeProperty(auto_now_add=True)
+  up_vote    = db.IntegerProperty()
+  down_vote  = db.IntegerProperty()
 
 class Comment(db.Model):
   """Models an individual comment with an author, content, and date."""

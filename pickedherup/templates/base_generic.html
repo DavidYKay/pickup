@@ -17,10 +17,13 @@
        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
        })();
-     </script>
+    </script>
   </head>
   <body>
     <div id="wrap">
+      <div id="ad-leaderboard">
+        <img src="http://placehold.it/728x90"  alt="Ads go here."/>
+      </div>
       <div id="header"><h1>Picked Her Up</h1></div>
       <div id="nav">
         <div id="buttons">
@@ -42,18 +45,18 @@
       </div>
       <div id="sidebar">
         <h2>Right-hand Column</h2>
-        <p>Ads go here.</p>
-        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Mauris vel magna.</p>
-        <ul>
-          <li><a href="/">Link 1</a></li>
-          <li><a href="/">Link 2</a></li>
-          <li><a href="/">Link 3</a></li>
-          <li><a href="/">Link 4</a></li>
-          <li><a href="/">Link 5</a></li>
-        </ul>
+        <p>Ads should be below.</p>
+        <div id="ad-skyscraper">
+          <img src="http://placehold.it/160x600"  alt="Ads go here." />
+        </div>
       </div>
       <div id="footer">
-        <p>Copyright 2011, Kong Entertainment</p>
+        <div id="ad-footer-leaderboard">
+          <img src="http://placehold.it/728x90" alt="Ads go here." />
+        </div>
+        <div id="copyright">
+          <p>Copyright 2011, Kong Entertainment</p>
+        </div>
       </div>
     </div>
   </body>
