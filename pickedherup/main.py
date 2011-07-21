@@ -56,8 +56,8 @@ class Story(db.Model):
   author     = db.UserProperty()
   content    = db.StringProperty(multiline=True)
   date       = db.DateTimeProperty(auto_now_add=True)
-  up_vote    = db.IntegerProperty()
-  down_vote  = db.IntegerProperty()
+  up_vote    = db.IntegerProperty(default=0)
+  down_vote  = db.IntegerProperty(default=0)
 
 class Comment(db.Model):
   """Models an individual comment with an author, content, and date."""
@@ -90,10 +90,35 @@ class BasePage(webapp.RequestHandler):
         story.nicetime = Helpers.nicetime(story.date)
         story.id = story.key().id()
         story.comment_url = '/story?' + urllib.urlencode({'story_id': story.id})
+        story.upvote_url = '/vote?' + urllib.urlencode({
+            'story_id': story.id,
+            'upvote': 1, 
+            })
+        story.downvote_url = '/vote?' + urllib.urlencode({
+            'story_id': story.id,
+            'upvote': 0, 
+            })
 
     if (shuffle):
       random.shuffle(stories)
     return stories
+  
+  def fetchStory(self, story_id):
+    """Fetches a single story from the DataStore."""
+    # Prepare a stories query for the datastore.
+    # This tells us what to filter by.
+    key = storyIdToKey(story_id)
+    stories_query = Story.all().filter('__key__ = ', key)
+
+    # Execute the query on the datastore, telling it how many documents we want. We get a list back.
+    stories = stories_query.fetch(1)
+    # Grab the first member of the list.
+    story = stories[0]
+
+    # Add the nicetime to the story.
+    story.nicetime = Helpers.nicetime(story.date)
+    story.id = story_id
+    return story
 
 class MainPage(BasePage):
   """ Homepage. Takes care of the login link and the list of stories. """
@@ -111,23 +136,6 @@ class MainPage(BasePage):
 class CommentPage(BasePage):
   """ The comment page. """
   template_name = 'comment.html'
-
-  def fetchStory(self, story_id):
-    """Fetches a single story from the DataStore."""
-    # Prepare a stories query for the datastore.
-    # This tells us what to filter by.
-    key = storyIdToKey(story_id)
-    stories_query = Story.all().filter('__key__ = ', key)
-
-    # Execute the query on the datastore, telling it how many documents we want. We get a list back.
-    stories = stories_query.fetch(1)
-    # Grab the first member of the list.
-    story = stories[0]
-
-    # Add the nicetime to the story.
-    story.nicetime = Helpers.nicetime(story.date)
-    story.id = story_id
-    return story
 
   def fetchComments(self, story_id):
     """Fetches comments from the DataStore."""
@@ -156,7 +164,7 @@ class CommentPage(BasePage):
 
 class CommentHandler(webapp.RequestHandler):
   """ Handles comment uploading. :"""
-  #TODO: Consider merging this with above handler.
+  #TODO: Consider merging this with CommentPage handler.
   def post(self):
     story_id = self.request.get('story_id')
     # Create comment object.
@@ -165,12 +173,33 @@ class CommentHandler(webapp.RequestHandler):
       comment.author = users.get_current_user()
     # Fetch content from request.
     comment.content = self.request.get('content')
-    # TODO: See if this works properly
+    # Store our story key to trace the relationship.
     comment.story = storyIdToKey(story_id)
     # Store in datastore.
     comment.put()
     # Redirect back to story & comment page.
     self.redirect('/story?' + urllib.urlencode({'story_id': story_id}))
+
+class VoteHandler(BasePage):
+  """ Handles up/downvote uploading."""
+  def get(self):
+    storybook_name = self.request.get('storybook_name')
+    story_id = self.request.get('story_id')
+    up_or_down = self.request.get('upvote')
+
+    story = self.fetchStory(story_id)
+
+    # Increment up/down votes.
+    if int(up_or_down):
+      story.up_vote += 1
+    else: 
+      story.down_vote += 1
+
+    # Store in datastore.
+    story.put()
+
+    # Redirect back to home page.
+    self.redirect('/')
 
 class NewPage(MainPage):
   """ The input page. Largely the same as the mainpage, but with a different
@@ -205,6 +234,7 @@ application = webapp.WSGIApplication([
   ('/', MainPage),
   ('/story', CommentPage),
   ('/comment', CommentHandler),
+  ('/vote', VoteHandler),
   ('/new', NewPage),
   ('/random', RandomPage),
   ('/sign', Storybook)
