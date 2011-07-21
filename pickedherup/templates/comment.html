@@ -13,8 +13,8 @@
       <blockquote>{{ story.content|escape }}</blockquote>
     </div>
     <div class="author">
-      {% if comment.author %}
-      by <b>{{ comment.author.nickname }}</b>
+      {% if story.author %}
+      by <b>{{ story.author.nickname }}</b>
       {% else %}
       by Anonymous
       {% endif %}
