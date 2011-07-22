@@ -42,8 +42,18 @@ class Helpers:
 
   @staticmethod
   def renderWithLogin(requestHandler, template_name, template_values):
-    # Add login link to our template values.
+    """Add login link to our template values."""
+
+    # get current hostname
+    if os.environ.get('HTTP_HOST'):
+      hostname = os.environ['HTTP_HOST']
+    else:
+      hostname = os.environ['SERVER_NAME']
+
     template_values = dict(template_values.items() +
+                           {
+                               'hostname': hostname,
+                           }.items() +
                            Helpers.createLoginLink(requestHandler).items())
     # Render response to client.
     requestHandler.response.out.write(
@@ -77,6 +87,22 @@ def storybook_key(storybook_name=None):
 
 class BasePage(webapp.RequestHandler):
   """Abstract superclass to all pages that display the central feed."""
+
+  """Add the extra fields the story isn't born with."""
+  def addStoryExtras(self, story):
+    story.nicetime = Helpers.nicetime(story.date)
+    story.id = story.key().id()
+    story.comment_url = '/story?' + urllib.urlencode({'story_id': story.id})
+    story.upvote_url = '/vote?' + urllib.urlencode({
+        'story_id': story.id,
+        'upvote': 1, 
+        })
+    story.downvote_url = '/vote?' + urllib.urlencode({
+        'story_id': story.id,
+        'upvote': 0, 
+        })
+    return story
+
   def fetchStories(self, shuffle=False):
     """Fetches stories from the DataStore.
       TODO: Pass in different parameters based on different criteria.
@@ -87,17 +113,7 @@ class BasePage(webapp.RequestHandler):
     stories = stories_query.fetch(Constants.NUM_STORIES)
     # Add the nicetime to the story.
     for story in stories:
-        story.nicetime = Helpers.nicetime(story.date)
-        story.id = story.key().id()
-        story.comment_url = '/story?' + urllib.urlencode({'story_id': story.id})
-        story.upvote_url = '/vote?' + urllib.urlencode({
-            'story_id': story.id,
-            'upvote': 1, 
-            })
-        story.downvote_url = '/vote?' + urllib.urlencode({
-            'story_id': story.id,
-            'upvote': 0, 
-            })
+        story = self.addStoryExtras(story)
 
     if (shuffle):
       random.shuffle(stories)
@@ -114,10 +130,9 @@ class BasePage(webapp.RequestHandler):
     stories = stories_query.fetch(1)
     # Grab the first member of the list.
     story = stories[0]
+    # Add the nicetime, etc to the story.
+    story = self.addStoryExtras(story)
 
-    # Add the nicetime to the story.
-    story.nicetime = Helpers.nicetime(story.date)
-    story.id = story_id
     return story
 
 class MainPage(BasePage):

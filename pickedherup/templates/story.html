@@ -16,6 +16,11 @@
     <a href="{{ story.upvote_url }}">Upvote ({{ story.up_vote }})</a>
     <a href="{{ story.downvote_url }}">Downvote ({{ story.down_vote }})</a>
   </div>
+  <div class="sharing">
+    <a href="http://twitter.com/share" class="twitter-share-button"
+      data-url="http://{{ hostname }}{{ story.comment_url }}" data-text="Check out how I picked her up!" data-count="none" data-via="PickedHerUp">Tweet</a>
+      <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+  </div>
   <div class="comments">
     <a href="{{ story.comment_url }}">Comments</a>
   </div>

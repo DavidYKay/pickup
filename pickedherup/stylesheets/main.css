@@ -94,8 +94,19 @@ ul, ol {
 }
   */
 
+.controls {
+  clear: both;
+  overflow: hidden;
+}
+
 .voting {
   float: left;
+}
+
+.sharing {
+  float: left;
+  margin-left: 4px;
+  margin-right: 4px;
 }
 
 .comments {
@@ -103,7 +114,3 @@ ul, ol {
   margin-left: 4px;
 }
 
-.controls {
-  clear: both;
-  overflow: hidden;
-}
