@@ -74,9 +74,9 @@ ul, ol {
 
 /* Story Styles. */
 
-#main ul#stories-list li {
+#main ul#story li {
   background:#fff;
-}
+  }
 
 /* Special rule for story on comments page. */
 #main ul#stories-list li .text {

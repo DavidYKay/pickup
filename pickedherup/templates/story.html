@@ -1,5 +1,5 @@
 <div class="text">
-  <blockquote>{{ story.content|escape }}</blockquote>
+  <blockquote><a href="{{ story.comment_url }}">{{ story.content|escape }}</a></blockquote>
 </div>
 <div class="author">
   {% if story.author %}
