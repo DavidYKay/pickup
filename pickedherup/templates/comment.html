@@ -1,6 +1,6 @@
 {% extends "base_generic.html" %}
 
-{% block title %}Picked Her Up | Story Number: {{ story.id }} {% endblock %}
+{% block title %}Picked Her Up | {{ story.content|truncatewords:12 }} {% endblock %}
 
 {% block content %}
 

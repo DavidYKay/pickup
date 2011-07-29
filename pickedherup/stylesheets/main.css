@@ -5,6 +5,7 @@ body, html {
   color:#000;
   background:#a7a09a;
 }
+
 #wrap {
   width:920px;
   margin:0 auto;
@@ -79,9 +80,17 @@ ul, ol {
   }
 
 /* Special rule for story on comments page. */
+
+
+
 #main ul#stories-list li .text {
   background:#fff;
+  color:#000000;
 }
+
+.text {
+  text-decoration:none;
+  }
 
 #main ul#comments-list li {
   background:#fff;
