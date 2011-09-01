@@ -118,6 +118,26 @@ class BasePage(webapp.RequestHandler):
     if (shuffle):
       random.shuffle(stories)
     return stories
+    
+  def fetchStoriesWithCursor(self, oldCursor=None, shuffle=False):
+    """Fetches stories from the DataStore.
+      Returns a cursor to the current location.
+    """
+    storybook_name = self.request.get('storybook_name')
+    stories_query = Story.all().ancestor(
+        storybook_key(storybook_name)).order('-date')
+    if oldCursor:
+      stories_query.with_cursor(start_cursor=oldCursor)
+    stories = stories_query.fetch(Constants.NUM_STORIES)
+    newCursor = stories_query.cursor()
+    # Add the nicetime to the story.
+    for story in stories:
+        story = self.addStoryExtras(story)
+
+    if (shuffle):
+      random.shuffle(stories)
+    # You'll have to find a way to store the newCursor, because we'll need it next time.
+    return (newCursor, stories)
   
   def fetchStory(self, story_id):
     """Fetches a single story from the DataStore."""
